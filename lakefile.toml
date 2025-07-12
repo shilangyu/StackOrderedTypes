@@ -1,0 +1,10 @@
+name = "stack_ordered_types"
+version = "0.1.0"
+defaultTargets = ["stack_ordered_types"]
+
+[[lean_lib]]
+name = "StackOrderedTypes"
+
+[[lean_exe]]
+name = "stack_ordered_types"
+root = "Main"
