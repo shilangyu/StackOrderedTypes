@@ -71,3 +71,17 @@ inductive Typing : TyCtx -> Term -> TyCtx -> Prop where
 | app : Typing (.function ctx1 ctx2 ::: ctx1 ++ ctx) .app (ctx2 ++ ctx)
 | dup : ctx.nth i = some T -> Typing ctx (.dup i) (T ::: ctx)
 | seq : Typing ctx1 t1 ctx2 -> Typing ctx2 t2 ctx3 -> Typing ctx1 (t1 ; t2) ctx3
+
+theorem q15 :
+  (.number 4 ; .number 1 ; .dup 1 ; .dup 1 ; .bin_op .plus) ⇓ (.number 5 :: .number 1 :: .number 4 :: []) := by
+  repeat constructor
+
+theorem q16 : ∃s,
+  (.function ctx (.number 1 ; .bin_op .plus) ; .number 4 ; .dup 1 ; .app) ⇓ s := by
+  repeat constructor
+
+theorem q17 : ∃t, ∀s, ¬t ⇓ s := by
+  apply Exists.intro .app
+  intro s reduction
+  cases reduction
+
