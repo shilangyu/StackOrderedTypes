@@ -1,3 +1,13 @@
+mutual
+  inductive TyCtx where
+  | empty
+  | push (t : Ty) (ctx : TyCtx)
+
+  inductive Ty where
+  | number
+  | function : TyCtx -> TyCtx -> Ty
+end
+
 inductive BinOp where
 | plus
 | times
@@ -5,7 +15,7 @@ inductive BinOp where
 inductive Term where
 | number (n : Nat)
 | bin_op (op : BinOp)
-| function (body : Term)
+| function (ctx : TyCtx) (body : Term)
 | app
 | dup (i : Nat)
 | seq (t1 t2 : Term)
@@ -33,8 +43,8 @@ def Stack.nth (s : Stack) (n : Nat) : Option Term :=
 inductive Reduce : (Stack × Term) -> Stack -> Prop where
 | number : Reduce (s, .number n) (.number n :: s)
 | bin_op : Reduce (.number n2 :: .number n1 :: s, .bin_op op) (BinOp.eval op n1 n2 :: s)
-| function : Reduce (s, .function body) (.function body :: s)
-| app : Reduce (s, body) s' -> Reduce (.function body :: s, .app) s'
+| function : Reduce (s, .function ctx body) (.function ctx body :: s)
+| app : Reduce (s, body) s' -> Reduce (.function ctx body :: s, .app) s'
 | dup : Stack.nth s i = some t -> Reduce (s, .dup i) (t :: s)
 | seq : Reduce (s1, t1) s2 -> Reduce (s2, t2) s3 -> Reduce (s1, t1 ; t2) s3
 
