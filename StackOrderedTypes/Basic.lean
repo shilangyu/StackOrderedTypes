@@ -87,6 +87,31 @@ theorem q17 : ∃t, ∀s, ¬t ⇓ s := by
   intro s reduction
   cases reduction
 
+theorem q18 : ∀ t s s', (t ⇓ s) ∧ (t ⇓ s') → s = s' := by
+  have general : ∀ t s s' ctx, (ctx ‖ t ==> s) ∧ (ctx ‖ t ==> s') → s = s' := by
+    intro t s s' ctx ⟨reduction1, reduction2⟩
+
+    induction reduction1 generalizing s'
+    . cases reduction2
+      rfl
+    . cases reduction2
+      rfl
+    . cases reduction2
+      rfl
+    . cases reduction2
+      apply_assumption
+      assumption
+    . cases reduction2
+      simp_all
+    . apply_assumption
+      cases reduction2
+      rename_i a b c d e
+      specialize a _ d
+      subst a
+      assumption
+
+  exact general (ctx := _)
+
 theorem q19 : ∃ctx, .empty ⊢ (.number 4 ; .function (.number ::: .empty) (.number 1 ; .bin_op .plus) ; .app) : ctx := by
   apply Exists.intro
   repeat constructor
