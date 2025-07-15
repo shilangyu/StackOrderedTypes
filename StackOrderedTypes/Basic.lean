@@ -53,15 +53,15 @@ def Stack.nth (s : Stack) (n : Nat) : Option Term :=
   | _ :: s, n + 1 => s.nth n
   | [], _ => none
 
-inductive Reduce : (Stack × Term) -> Stack -> Prop where
-| number : Reduce (s, .number n) (.number n :: s)
-| bin_op : Reduce (.number n2 :: .number n1 :: s, .bin_op op) (BinOp.eval op n1 n2 :: s)
-| function : Reduce (s, .function ctx body) (.function ctx body :: s)
-| app : Reduce (s, body) s' -> Reduce (.function ctx body :: s, .app) s'
-| dup : s.nth i = some t -> Reduce (s, .dup i) (t :: s)
-| seq : Reduce (s1, t1) s2 -> Reduce (s2, t2) s3 -> Reduce (s1, t1 ; t2) s3
+inductive Reduce : Stack -> Term -> Stack -> Prop where
+| number : Reduce s (.number n) (.number n :: s)
+| bin_op : Reduce (.number n2 :: .number n1 :: s) (.bin_op op) (BinOp.eval op n1 n2 :: s)
+| function : Reduce s (.function ctx body) (.function ctx body :: s)
+| app : Reduce s body s' -> Reduce (.function ctx body :: s) .app s'
+| dup : s.nth i = some t -> Reduce s (.dup i) (t :: s)
+| seq : Reduce s1 t1 s2 -> Reduce s2 t2 s3 -> Reduce s1 (t1 ; t2) s3
 
-notation s "‖" t " ==> " s' => Reduce (s, t) s'
+notation s "‖" t " ==> " s' => Reduce s t s'
 notation t " ⇓ " s => [] ‖ t ==> s
 
 inductive Typing : TyCtx -> Term -> TyCtx -> Prop where
