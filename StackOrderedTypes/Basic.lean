@@ -88,29 +88,37 @@ theorem q17 : ∃t, ∀s, ¬t ⇓ s := by
   cases reduction
 
 theorem q18 : ∀ t s s', (t ⇓ s) ∧ (t ⇓ s') → s = s' := by
-  have general : ∀ t s s' ctx, (ctx ‖ t ==> s) ∧ (ctx ‖ t ==> s') → s = s' := by
-    intro t s s' ctx ⟨reduction1, reduction2⟩
+  have general : ∀ t s s' st, (st ‖ t ==> s) ∧ (st ‖ t ==> s') → s = s' := by
+    intro t s s' st ⟨reduction1, reduction2⟩
 
-    induction reduction1 generalizing s'
-    . cases reduction2
-      rfl
-    . cases reduction2
-      rfl
-    . cases reduction2
-      rfl
-    . cases reduction2
-      apply_assumption
-      assumption
-    . cases reduction2
-      simp_all
-    . apply_assumption
+    induction reduction1 generalizing s' with
+    | number =>
       cases reduction2
-      rename_i a b c d e
-      specialize a _ d
-      subst a
-      assumption
+      rfl
+    | bin_op =>
+      cases reduction2
+      rfl
+    | function =>
+      cases reduction2
+      rfl
+    | app _ ih =>
+      cases reduction2
+      rename_i bh
+      exact ih _ bh
+    | dup h1 =>
+      cases reduction2
+      rename_i h2
+      rw [h1] at h2
+      injection h2 with eq
+      rw [eq]
+    | seq h1 h2 ih1 ih2 =>
+      cases reduction2
+      rename_i h1' h2'
+      have eq := ih1 _ h1'
+      rw [eq] at ih2
+      exact ih2 _ h2'
 
-  exact general (ctx := _)
+  exact general (st := _)
 
 theorem q19 : ∃ctx, .empty ⊢ (.number 4 ; .function (.number ::: .empty) (.number 1 ; .bin_op .plus) ; .app) : ctx := by
   apply Exists.intro
