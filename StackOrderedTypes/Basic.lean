@@ -124,3 +124,5 @@ theorem q19 : ∃ctx, .empty ⊢ (.number 4 ; .function (.number ::: .empty) (.n
   apply Exists.intro
   repeat constructor
 
+theorem q20 : ∀t ctx, (.empty ⊢ t : ctx) → ∃s, t ⇓ s := by
+  sorry
